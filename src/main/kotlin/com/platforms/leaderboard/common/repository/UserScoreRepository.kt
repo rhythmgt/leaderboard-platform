@@ -1,7 +1,7 @@
-package com.platforms.leaderboard.read.repository
+package com.platforms.leaderboard.common.repository
 
 import com.platforms.leaderboard.read.domain.UserScoreWithRank
-import com.platforms.leaderboard.read.entity.UserScore
+import com.platforms.leaderboard.common.entity.UserScore
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository

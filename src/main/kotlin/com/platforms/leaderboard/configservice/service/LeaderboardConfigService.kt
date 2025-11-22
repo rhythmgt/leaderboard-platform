@@ -5,12 +5,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.platforms.leaderboard.configservice.dto.LeaderboardConfigDto
+import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.util.FileCopyUtils
 import java.io.InputStreamReader
-import javax.annotation.PostConstruct
 
 @Service
 class LeaderboardConfigService(

@@ -1,6 +1,6 @@
 package com.platforms.leaderboard.read.domain
 
-import com.platforms.leaderboard.read.entity.UserScore
+import com.platforms.leaderboard.common.entity.UserScore
 
 data class UserScoreWithRank(
     val userScore: UserScore,

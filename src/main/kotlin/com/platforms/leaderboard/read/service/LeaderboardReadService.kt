@@ -1,12 +1,12 @@
 package com.platforms.leaderboard.read.service
 
 import com.platforms.leaderboard.read.domain.LeaderboardEntry
-import com.platforms.leaderboard.read.repository.CompositeLeaderboardReadRepository
+import com.platforms.leaderboard.common.repository.CompositeLeaderboardRepository
 import org.springframework.stereotype.Service
 
 @Service
 class LeaderboardReadService(
-    private val leaderboardReadRepository: CompositeLeaderboardReadRepository
+    private val leaderboardReadRepository: CompositeLeaderboardRepository
 ) {
     /**
      * Get top K entries from a leaderboard instance
