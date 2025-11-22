@@ -48,10 +48,9 @@ A high-performance, multi-tenant leaderboard platform with real-time score updat
 ## API Endpoints
 
 ### User Score API
-- `POST /api/v1/user-score` - Update a user's score using feature-based calculation
+- `POST /api/v1/leaderboard/{leaderboardId}/user-score` - Update a user's score using feature-based calculation
   ```json
   {
-    "leaderboardInstanceId": "leaderboard1",
     "userId": "user123",
     "features": {
       "numberOfPayments": 5,
@@ -61,8 +60,8 @@ A high-performance, multi-tenant leaderboard platform with real-time score updat
   ```
 
 ### Leaderboard API
-- `GET /api/v1/leaderboard/user-score/top?leaderboardInstanceId=leaderboard1&limit=10` - Get top users
-- `GET /api/v1/leaderboard/user-score/{userId}?leaderboardInstanceId=leaderboard1` - Get rank for a specific user
+- `GET /api/v1/leaderboard/{leaderboardId}/user-score/top?limit=10` - Get top users
+- `GET /api/v1/leaderboard/{leaderboardId}/user-score/{userId}` - Get rank for a specific user
 
 ## Testing with Test Script
 
@@ -84,8 +83,8 @@ A high-performance, multi-tenant leaderboard platform with real-time score updat
 
 ## API Endpoints
 
-### Write API
-- `POST /api/v1/leaderboard/write/score` - Update a user's score directly
+### Legacy Endpoints (Deprecated)
+- `POST /api/v1/leaderboard/write/score` - Update a user's score directly (deprecated)
   ```json
   {
     "leaderboardInstanceId": "leaderboard1",
@@ -94,7 +93,7 @@ A high-performance, multi-tenant leaderboard platform with real-time score updat
   }
   ```
 
-- `POST /api/v1/leaderboard/write/score/features` - Update score using feature-based calculation
+- `POST /api/v1/leaderboard/write/score/features` - Update score using feature-based calculation (deprecated)
   ```json
   {
     "leaderboardInstanceId": "leaderboard1",
