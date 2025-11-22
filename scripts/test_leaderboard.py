@@ -18,6 +18,7 @@ DB_CONFIG = {
     "password": "leaderboard123",
     "port": 5432
 }
+REDIS_PASSWORD = "leaderboard123"
 
 def run_command(cmd: List[str], cwd: str = None) -> subprocess.CompletedProcess:
     """Run a shell command and return the result."""
@@ -77,7 +78,7 @@ def setup_test_data():
     import redis
     
     # Connect to Redis
-    r = redis.Redis(host='localhost', port=6379, db=0, password='leaderboard123')
+    r = redis.Redis(host='localhost', port=6379, db=0, password=REDIS_PASSWORD, decode_responses=True)
     
     # Clear existing leaderboard
     r.delete('leaderboard:leaderboard1')
@@ -127,44 +128,32 @@ def main():
         print("\n⏳ Waiting for the application to start...")
         time.sleep(5)
         
-        # Test repository endpoints
-        print("\n🧪 Testing Repository Endpoints")
+        # Wait a bit longer for the application to fully start
+        print("\n⏳ Waiting for the application to start...")
+        time.sleep(10)  # Increased wait time to ensure app is ready
+        
+        # Test leaderboard endpoints
+        print("\n🏆 Testing Leaderboard Endpoints")
+        
+        # Test top scores endpoint
         test_endpoint(
-            "Repository - Top Scores",
-            "repository/top",
+            "Top Scores",
+            "leaderboard/top",
             {"instanceId": "leaderboard1", "limit": 5}
         )
         
+        # Test user rank endpoint
         test_endpoint(
-            "Repository - User Rank",
-            "repository/rank/user5",
+            "User Rank",
+            "leaderboard/rank/user5",
             {"instanceId": "leaderboard1"}
         )
         
+        # Test top scores with default limit (should be 10)
         test_endpoint(
-            "Repository - Around User",
-            "repository/around/user5",
-            {"instanceId": "leaderboard1", "limit": 3}
-        )
-        
-        # Test optimized endpoints
-        print("\n🚀 Testing Optimized Endpoints")
-        test_endpoint(
-            "Optimized - Top Scores",
-            "optimized/top",
-            {"instanceId": "leaderboard1", "limit": 5}
-        )
-        
-        test_endpoint(
-            "Optimized - User Rank",
-            "optimized/rank/user5",
+            "Top Scores with Default Limit",
+            "leaderboard/top",
             {"instanceId": "leaderboard1"}
-        )
-        
-        test_endpoint(
-            "Optimized - Around User",
-            "optimized/around/user5",
-            {"instanceId": "leaderboard1", "limit": 3}
         )
         
         print("\n✅ All tests completed successfully!")

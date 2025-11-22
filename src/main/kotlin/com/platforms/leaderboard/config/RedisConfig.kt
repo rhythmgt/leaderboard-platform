@@ -3,6 +3,7 @@ package com.platforms.leaderboard.config
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.redis.connection.RedisPassword
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory
@@ -21,7 +22,9 @@ class RedisConfig(
     @Bean
     fun jedisConnectionFactory(): JedisConnectionFactory {
         val redisConfig = RedisStandaloneConfiguration(host, port)
-        redisConfig.password = password
+        if (password.isNotBlank()) {
+            redisConfig.password = RedisPassword.of(password)
+        }
 
         val jedisClientConfig = JedisClientConfiguration.builder()
             .connectTimeout(Duration.ofSeconds(10))

@@ -1,12 +1,12 @@
 package com.platforms.leaderboard.read.service
 
 import com.platforms.leaderboard.read.domain.LeaderboardEntry
-import com.platforms.leaderboard.read.repository.LeaderboardReadRepository
+import com.platforms.leaderboard.read.repository.CompositeLeaderboardReadRepository
 import org.springframework.stereotype.Service
 
 @Service
 class LeaderboardReadService(
-    private val leaderboardReadRepository: LeaderboardReadRepository
+    private val leaderboardReadRepository: CompositeLeaderboardReadRepository
 ) {
     /**
      * Get top K entries from a leaderboard instance
@@ -25,7 +25,7 @@ class LeaderboardReadService(
         require(limit > 0) { "Limit must be greater than 0" }
         require(offset >= 0) { "Offset must be non-negative" }
         
-        return leaderboardReadRepository.getTopK(instanceId, limit, offset, isHighestFirst)
+        return leaderboardReadRepository.getTopK(instanceId, limit, isHighestFirst)
     }
 
     /**
@@ -43,22 +43,5 @@ class LeaderboardReadService(
         return leaderboardReadRepository.getUserRank(instanceId, userId, isHighestFirst)
     }
 
-    /**
-     * Get leaderboard entries around a specific user
-     * @param instanceId The leaderboard instance ID
-     * @param userId The user ID to center the results around
-     * @param limit Number of entries to return (total, including the target user)
-     * @param isHighestFirst Whether to sort by highest score first
-     * @return List of leaderboard entries with ranks
-     */
-    suspend fun getAroundUser(
-        instanceId: String,
-        userId: String,
-        limit: Int,
-        isHighestFirst: Boolean = true
-    ): List<LeaderboardEntry> {
-        require(limit > 0) { "Limit must be greater than 0" }
-        
-        return leaderboardReadRepository.getAroundUser(instanceId, userId, limit, isHighestFirst)
-    }
+
 }

@@ -2,29 +2,19 @@ package com.platforms.leaderboard.common.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.MappedSuperclass
-import jakarta.persistence.PrePersist
-import jakarta.persistence.PreUpdate
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
 
 @MappedSuperclass
 abstract class BaseEntity {
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    var createdAt: Instant = Instant.now()
+    var createdAt: Instant? = null
         protected set
 
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: Instant = Instant.now()
+    var updatedAt: Instant? = null
         protected set
-
-    @PrePersist
-    protected fun onCreate() {
-        val now = Instant.now()
-        createdAt = now
-        updatedAt = now
-    }
-
-    @PreUpdate
-    protected fun onUpdate() {
-        updatedAt = Instant.now()
-    }
 }

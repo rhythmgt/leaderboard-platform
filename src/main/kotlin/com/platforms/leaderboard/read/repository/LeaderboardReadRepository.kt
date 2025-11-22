@@ -14,7 +14,6 @@ interface LeaderboardReadRepository {
     suspend fun getTopK(
         instanceId: String,
         limit: Int,
-        offset: Int = 0,
         isHighestFirst: Boolean = true
     ): List<LeaderboardEntry>
 
@@ -31,18 +30,5 @@ interface LeaderboardReadRepository {
         isHighestFirst: Boolean = true
     ): LeaderboardEntry?
 
-    /**
-     * Get leaderboard entries around a specific user
-     * @param instanceId The leaderboard instance ID
-     * @param userId The user ID to center the results around
-     * @param limit Number of entries to return (total, including the target user)
-     * @param isHighestFirst Whether to sort by highest score first
-     * @return List of leaderboard entries with ranks
-     */
-    suspend fun getAroundUser(
-        instanceId: String,
-        userId: String,
-        limit: Int,
-        isHighestFirst: Boolean = true
-    ): List<LeaderboardEntry>
+
 }

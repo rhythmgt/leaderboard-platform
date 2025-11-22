@@ -19,14 +19,13 @@ class CompositeLeaderboardReadRepository(
     override suspend fun getTopK(
         instanceId: String,
         limit: Int,
-        offset: Int,
         isHighestFirst: Boolean
     ): List<LeaderboardEntry> {
         return try {
-            redisRepository.getTopK(instanceId, limit, offset, isHighestFirst)
+            redisRepository.getTopK(instanceId, limit,  isHighestFirst)
         } catch (e: DataAccessException) {
-            logger.warn("Redis access failed, falling back to SQL", e)
-            sqlRepository.getTopK(instanceId, limit, offset, isHighestFirst)
+            logger.error("Redis access failed, falling back to SQL", e)
+            sqlRepository.getTopK(instanceId, limit, isHighestFirst)
         }
     }
 
@@ -39,27 +38,10 @@ class CompositeLeaderboardReadRepository(
             redisRepository.getUserRank(instanceId, userId, isHighestFirst)
                 ?: sqlRepository.getUserRank(instanceId, userId, isHighestFirst)
         } catch (e: DataAccessException) {
-            logger.warn("Redis access failed, falling back to SQL", e)
+            logger.error("Redis access failed, falling back to SQL", e)
             sqlRepository.getUserRank(instanceId, userId, isHighestFirst)
         }
     }
 
-    override suspend fun getAroundUser(
-        instanceId: String,
-        userId: String,
-        limit: Int,
-        isHighestFirst: Boolean
-    ): List<LeaderboardEntry> {
-        return try {
-            val redisResult = redisRepository.getAroundUser(instanceId, userId, limit, isHighestFirst)
-            if (redisResult.isNotEmpty()) {
-                redisResult
-            } else {
-                sqlRepository.getAroundUser(instanceId, userId, limit, isHighestFirst)
-            }
-        } catch (e: DataAccessException) {
-            logger.warn("Redis access failed, falling back to SQL", e)
-            sqlRepository.getAroundUser(instanceId, userId, limit, isHighestFirst)
-        }
-    }
+
 }

@@ -1,78 +1,47 @@
 package com.platforms.leaderboard.read.controller
 
 import com.platforms.leaderboard.read.domain.LeaderboardEntry
-import com.platforms.leaderboard.read.repository.LeaderboardReadRepository
-import com.platforms.leaderboard.read.repository.SqlLeaderboardReadRepository
+import com.platforms.leaderboard.read.service.LeaderboardService
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/leaderboard")
+@Validated
 class LeaderboardController(
-    private val leaderboardReadRepository: LeaderboardReadRepository,
-    private val sqlLeaderboardReadRepository: SqlLeaderboardReadRepository
+    private val leaderboardService: LeaderboardService
 ) {
-
-    // Using Repository pattern (simpler queries)
-    @GetMapping("/repository/top")
-    suspend fun getTopKWithRepository(
-        @RequestParam instanceId: String,
-        @RequestParam(defaultValue = "10") limit: Int,
-        @RequestParam(defaultValue = "0") offset: Int,
-        @RequestParam(defaultValue = "true") highestFirst: Boolean
-    ): List<LeaderboardEntry> {
-        return leaderboardReadRepository.getTopK(instanceId, limit, offset, highestFirst)
+    companion object {
+        private const val DEFAULT_TOP_LIMIT = 10
+        private const val MAX_TOP_LIMIT = 100
     }
 
-    // Using DatabaseClient (complex optimized queries)
-    @GetMapping("/optimized/top")
-    suspend fun getTopKOptimized(
+    /**
+     * Get top users from the leaderboard
+     * @param instanceId The ID of the leaderboard instance
+     * @param limit Maximum number of results to return (1-100, default: 10)
+     * @return List of leaderboard entries with 1-based ranks
+     * @throws javax.validation.ConstraintViolationException if limit is out of range
+     */
+    @GetMapping("/top")
+    suspend fun getTop(
         @RequestParam instanceId: String,
-        @RequestParam(defaultValue = "10") limit: Int,
-        @RequestParam(defaultValue = "0") offset: Int,
-        @RequestParam(defaultValue = "true") highestFirst: Boolean
+        @RequestParam(defaultValue = "10") limit: Int
     ): List<LeaderboardEntry> {
-        return sqlLeaderboardReadRepository.getTopK(instanceId, limit, offset, highestFirst)
+        return leaderboardService.getTop(instanceId, limit)
     }
 
-    // Get user rank with repository
-    @GetMapping("/repository/rank/{userId}")
-    suspend fun getUserRankWithRepository(
+    /**
+     * Get a user's rank and score from the leaderboard
+     * @param userId The ID of the user
+     * @param instanceId The ID of the leaderboard instance
+     * @return The leaderboard entry for the user with 1-based rank, or null if not found
+     */
+    @GetMapping("/rank/{userId}")
+    suspend fun getUserRank(
         @PathVariable userId: String,
-        @RequestParam instanceId: String,
-        @RequestParam(defaultValue = "true") highestFirst: Boolean
+        @RequestParam instanceId: String
     ): LeaderboardEntry? {
-        return leaderboardReadRepository.getUserRank(instanceId, userId, highestFirst)
-    }
-
-    // Get user rank with optimized query
-    @GetMapping("/optimized/rank/{userId}")
-    suspend fun getUserRankOptimized(
-        @PathVariable userId: String,
-        @RequestParam instanceId: String,
-        @RequestParam(defaultValue = "true") highestFirst: Boolean
-    ): LeaderboardEntry? {
-        return sqlLeaderboardReadRepository.getUserRank(instanceId, userId, highestFirst)
-    }
-
-    // Get users around a specific user with repository
-    @GetMapping("/repository/around/{userId}")
-    suspend fun getAroundUserWithRepository(
-        @PathVariable userId: String,
-        @RequestParam instanceId: String,
-        @RequestParam(defaultValue = "5") limit: Int,
-        @RequestParam(defaultValue = "true") highestFirst: Boolean
-    ): List<LeaderboardEntry> {
-        return leaderboardReadRepository.getAroundUser(instanceId, userId, limit, highestFirst)
-    }
-
-    // Get users around a specific user with optimized query
-    @GetMapping("/optimized/around/{userId}")
-    suspend fun getAroundUserOptimized(
-        @PathVariable userId: String,
-        @RequestParam instanceId: String,
-        @RequestParam(defaultValue = "5") limit: Int,
-        @RequestParam(defaultValue = "true") highestFirst: Boolean
-    ): List<LeaderboardEntry> {
-        return sqlLeaderboardReadRepository.getAroundUser(instanceId, userId, limit, highestFirst)
+        return leaderboardService.getUserRank(userId, instanceId)
     }
 }
