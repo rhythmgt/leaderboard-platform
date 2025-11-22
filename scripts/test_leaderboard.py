@@ -92,27 +92,34 @@ def clear_data_stores():
         print(f"❌ Error clearing Redis: {e}")
 
 def setup_test_data():
-    """Set up test data using the write API."""
-    print("\n📝 Setting up test data using write API...")
+    """Set up test data using the write API with feature-based scoring."""
+    print("\n📝 Setting up test data using feature-based scoring...")
     
-    # Insert test data (10 users with scores from 1000 to 100, decreasing by 100)
+    # Insert test data with features that will be used to calculate scores
     for i in range(1, 11):
         user_id = f'user{i}'
-        score = 1000 - ((i-1) * 100)
+        # Generate features that will result in scores from 1000 to 100, decreasing by 100
+        # Using the formula: score = (number_of_payments * 100) + (total_amount * 0.1)
+        # To get scores: 1000, 900, 800, ..., 100
+        number_of_payments = i  # 1 to 10
+        total_amount = (1000 - ((i-1) * 100)) * 10 - (number_of_payments * 1000)
         
         request_data = {
             "leaderboardInstanceId": "leaderboard1",
             "userId": user_id,
-            "score": float(score)
+            "features": {
+                "numberOfPayments": number_of_payments,
+                "totalAmount": total_amount
+            }
         }
         
-        print(f"  - Setting score for {user_id}: {score}")
-        response = post_to_api("leaderboard/write/score", request_data)
+        print(f"  - Setting features for {user_id}: {request_data['features']}")
+        response = post_to_api("leaderboard/write/score/features", request_data)
         
         if not response.get('success', False):
-            print(f"❌ Failed to set score for {user_id}")
+            print(f"❌ Failed to set features for {user_id}")
     
-    print("\n✅ Test data inserted via write API")
+    print("\n✅ Test data inserted using feature-based scoring")
 
 def test_endpoint(name: str, endpoint: str, params: Optional[Dict[str, Any]] = None):
     """Test an API endpoint and print the results."""

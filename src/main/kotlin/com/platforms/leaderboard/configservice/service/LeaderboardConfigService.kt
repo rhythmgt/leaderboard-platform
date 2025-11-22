@@ -47,6 +47,17 @@ class LeaderboardConfigService(
         return objectMapper.writeValueAsString(config)
     }
     
+    /**
+     * Get leaderboard configuration by instance ID
+     * @param instanceId The leaderboard instance ID
+     * @return The leaderboard configuration DTO
+     */
+    fun getConfig(instanceId: String): LeaderboardConfigDto {
+        // TODO: Implement actual lookup by instanceId
+        // For now, return the sample config
+        return getSampleConfig()
+    }
+    
     private fun loadSampleConfig(): LeaderboardConfigDto {
         val json = FileCopyUtils.copyToString(InputStreamReader(sampleConfigResource.inputStream))
         return loadConfigFromJson(json)
