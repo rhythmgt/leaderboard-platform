@@ -76,7 +76,6 @@ A high-performance, multi-tenant leaderboard platform with real-time score updat
    ```
 
    This will:
-   - Start the application (if not already running)
    - Clear existing test data
    - Insert test users with scores
    - Run test queries to verify functionality
@@ -145,29 +144,6 @@ A high-performance, multi-tenant leaderboard platform with real-time score updat
 - **Build**: `mvn clean package`
 - **Run**: `java -jar target/leaderboard-0.0.1-SNAPSHOT.jar`
 - **Run with dev profile**: `mvn spring-boot:run -Dspring-boot.run.profiles=dev`
-
-## Monitoring
-
-The application exposes Prometheus metrics and health endpoints:
-
-- Metrics: `http://localhost:8080/actuator/prometheus`
-- Health: `http://localhost:8080/actuator/health`
-- Info: `http://localhost:8080/actuator/info`
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Port conflicts**
-   - Ensure ports 8080 (app), 5432 (PostgreSQL), 6379 (Redis), and 9092 (Kafka) are available
-
-2. **Database connection issues**
-   - Verify PostgreSQL is running and accessible
-   - Check credentials in `application.properties`
-
-3. **Redis connection issues**
-   - Ensure Redis is running and accessible
-   - Check Redis configuration in `application.properties`
 
 ## License
 
