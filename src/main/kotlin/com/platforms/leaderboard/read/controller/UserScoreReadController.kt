@@ -23,9 +23,9 @@ class UserScoreReadController(
      * @return List of leaderboard entries with 1-based ranks
      * @throws javax.validation.ConstraintViolationException if limit is out of range
      */
-    @GetMapping("/user-score/top")
+    @GetMapping("/leaderboard/{leaderboardInstanceId}/user-score/top")
     suspend fun getTop(
-        @RequestParam leaderboardInstanceId: String,
+        @PathVariable leaderboardInstanceId: String,
         @RequestParam(defaultValue = "10") limit: Int
     ): List<LeaderboardEntry> {
         return leaderboardService.getTop(leaderboardInstanceId, limit)
@@ -37,7 +37,7 @@ class UserScoreReadController(
      * @param leaderboardInstanceId The ID of the leaderboard instance
      * @return The leaderboard entry for the user with 1-based rank, or null if not found
      */
-    @GetMapping("/user-score/{userId}")
+    @GetMapping("/leaderboard/{leaderboardInstanceId}/user-score/{userId}")
     suspend fun getUserRank(
         @PathVariable userId: String,
         @RequestParam leaderboardInstanceId: String

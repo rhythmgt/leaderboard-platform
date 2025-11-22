@@ -119,7 +119,6 @@ def setup_test_data():
         total_amount = (1000 * (i))
         
         request_data = {
-            "leaderboardInstanceId": "leaderboard1",
             "userId": user_id,
             "features": {
                 "numberOfPayments": number_of_payments,
@@ -127,17 +126,8 @@ def setup_test_data():
             }
         }
         
-        post_to_api('user-score', {
-            'leaderboardInstanceId': 'leaderboard1',
-            'userId': user_id,
-            'features': {
-                'numberOfPayments': number_of_payments,
-                'totalAmount': total_amount
-            }
-        })
-        
         print(f"  - Setting features for {user_id}: {request_data['features']}")
-        response = post_to_api("user-score", request_data)
+        response = post_to_api("leaderboard/leaderboard1/user-score", request_data)
         
         if not response.get('success', False):
             print(f"❌ Failed to set features for {user_id}")
@@ -193,16 +183,12 @@ def main():
         
         # Test getting top scores
         print("\n🔍 Testing Top Scores:")
-        test_endpoint("Top Scores", "user-score/top", {"leaderboardInstanceId": instance_id, "limit": limit})
+        test_endpoint("Top Scores", f"leaderboard/{instance_id}/user-score/top", {"leaderboardInstanceId": instance_id, "limit": limit})
         
         # Test getting a specific user's rank
         print("\n🔍 Testing User Rank:")
-        test_endpoint("User Rank", f"user-score/{test_user_id}", {"leaderboardInstanceId": instance_id})
-        
-        # Test getting top scores with default limit
-        print("\n🔍 Testing Top Scores with Default Limit:")
-        test_endpoint("Top Scores Default", "user-score/top", {"leaderboardInstanceId": instance_id})
-        
+        test_endpoint("User Rank", f"leaderboard/{instance_id}/user-score/{test_user_id}", {"leaderboardInstanceId": instance_id})
+
         print("\n✅ All tests completed successfully!")
         
     except subprocess.CalledProcessError as e:

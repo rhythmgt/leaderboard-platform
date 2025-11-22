@@ -4,7 +4,6 @@ package com.platforms.leaderboard.write.dto
  * Request for updating a score with features that will be used to calculate the score
  */
 data class FeatureBasedScoreUpdateRequest(
-    val leaderboardInstanceId: String,
     val userId: String,
     val features: Map<String, Any>
 )

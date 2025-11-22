@@ -24,6 +24,5 @@ class LeaderboardServiceImpl(
     override suspend fun getUserRank(userId: String, instanceId: String): LeaderboardEntry? {
         val config = configService.getConfig(instanceId)
         return leaderboardReadRepository.getUserRank(instanceId, userId, config.highestFirst())
-            ?.let { it.copy(rank = it.rank?.plus(1)) } // Convert to 1-based rank
     }
 }
