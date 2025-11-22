@@ -25,6 +25,7 @@ class CompositeLeaderboardRepository(
             redisRepository.getTopK(instanceId, limit,  isHighestFirst)
         } catch (e: DataAccessException) {
             logger.error("Redis access failed, falling back to SQL", e)
+            //todo add redis downtime metric
             sqlRepository.getTopK(instanceId, limit, isHighestFirst)
         }
     }
@@ -36,9 +37,13 @@ class CompositeLeaderboardRepository(
     ): LeaderboardEntry? {
         return try {
             redisRepository.getUserRank(instanceId, userId, isHighestFirst)
-                ?: sqlRepository.getUserRank(instanceId, userId, isHighestFirst)
+                ?: run {
+                    //todo add cache miss metric
+                    sqlRepository.getUserRank(instanceId, userId, isHighestFirst)
+                }
         } catch (e: DataAccessException) {
             logger.error("Redis access failed, falling back to SQL", e)
+            //todo add redis downtime metric
             sqlRepository.getUserRank(instanceId, userId, isHighestFirst)
         }
     }
@@ -48,6 +53,7 @@ class CompositeLeaderboardRepository(
         userId: String,
         score: Double
     ) {
+        //todo: this entire method should be retried in case of failure
         sqlRepository.saveScore(leaderboardInstanceId, userId, score)
         redisRepository.saveScore(leaderboardInstanceId, userId, score)
     }
