@@ -1,4 +1,4 @@
-package com.platforms.leaderboard.read.repository
+package com.platforms.leaderboard.common.repository
 
 import com.platforms.leaderboard.read.domain.LeaderboardEntry
 import org.slf4j.LoggerFactory
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component
  * A composite repository that first tries Redis and falls back to SQL if Redis is unavailable.
  */
 @Component
-class CompositeLeaderboardReadRepository(
-    private val redisRepository: RedisLeaderboardReadRepository,
-    private val sqlRepository: SqlLeaderboardReadRepository
-) : LeaderboardReadRepository {
+class CompositeLeaderboardRepository(
+    private val redisRepository: RedisLeaderboardRepository,
+    private val sqlRepository: SqlLeaderboardRepository
+) : LeaderboardRepository {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -25,6 +25,7 @@ class CompositeLeaderboardReadRepository(
             redisRepository.getTopK(instanceId, limit,  isHighestFirst)
         } catch (e: DataAccessException) {
             logger.error("Redis access failed, falling back to SQL", e)
+            //todo add redis downtime metric
             sqlRepository.getTopK(instanceId, limit, isHighestFirst)
         }
     }
@@ -36,11 +37,25 @@ class CompositeLeaderboardReadRepository(
     ): LeaderboardEntry? {
         return try {
             redisRepository.getUserRank(instanceId, userId, isHighestFirst)
-                ?: sqlRepository.getUserRank(instanceId, userId, isHighestFirst)
+                ?: run {
+                    //todo add cache miss metric
+                    sqlRepository.getUserRank(instanceId, userId, isHighestFirst)
+                }
         } catch (e: DataAccessException) {
             logger.error("Redis access failed, falling back to SQL", e)
+            //todo add redis downtime metric
             sqlRepository.getUserRank(instanceId, userId, isHighestFirst)
         }
+    }
+
+    override suspend fun saveScore(
+        leaderboardInstanceId: String,
+        userId: String,
+        score: Double
+    ) {
+        //todo: this entire method should be retried in case of failure
+        sqlRepository.saveScore(leaderboardInstanceId, userId, score)
+        redisRepository.saveScore(leaderboardInstanceId, userId, score)
     }
 
 

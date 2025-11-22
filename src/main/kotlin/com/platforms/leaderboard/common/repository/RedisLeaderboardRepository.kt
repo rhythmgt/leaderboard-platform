@@ -1,4 +1,4 @@
-package com.platforms.leaderboard.read.repository
+package com.platforms.leaderboard.common.repository
 
 import com.platforms.leaderboard.read.domain.LeaderboardEntry
 import org.springframework.data.redis.core.RedisTemplate
@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository
 import kotlin.getValue
 
 @Repository
-class RedisLeaderboardReadRepository(
+class RedisLeaderboardRepository(
     private val redisTemplate: RedisTemplate<String, String>
-) : LeaderboardReadRepository {
+) : LeaderboardRepository {
     
     companion object {
         private const val LEADERBOARD_KEY_PREFIX = "leaderboard:"
@@ -32,7 +32,15 @@ class RedisLeaderboardReadRepository(
         } ?: return emptyList()
 
         return range.mapIndexed { index, tuple ->
-            val rank = index + 1L // 1-based ranking
+            val rank = if (isHighestFirst) {
+                // For highest first, rank is simply index + 1
+                index + 1L
+            } else {
+                // For lowest first, we need to calculate the rank based on the total count
+                val total = zSetOps.zCard(key) ?: 0L
+                total - index
+            }
+            
             LeaderboardEntry(
                 userId = tuple.value ?: "",
                 score = tuple.score,
@@ -64,6 +72,10 @@ class RedisLeaderboardReadRepository(
         )
     }
 
+    override suspend fun saveScore(leaderboardInstanceId: String, userId: String, score: Double) {
+        val redisKey = getLeaderboardKey(leaderboardInstanceId)
+        zSetOps.add(redisKey, userId, score)
+    }
 
 
     private fun getLeaderboardKey(instanceId: String): String {

@@ -1,8 +1,8 @@
-package com.platforms.leaderboard.read.repository
+package com.platforms.leaderboard.common.repository
 
 import com.platforms.leaderboard.read.domain.LeaderboardEntry
 
-interface LeaderboardReadRepository {
+interface LeaderboardRepository {
     /**
      * Get top K entries from a leaderboard instance
      * @param instanceId The leaderboard instance ID
@@ -30,5 +30,6 @@ interface LeaderboardReadRepository {
         isHighestFirst: Boolean = true
     ): LeaderboardEntry?
 
+    suspend fun saveScore(leaderboardInstanceId: String, userId: String, score: Double)
 
 }

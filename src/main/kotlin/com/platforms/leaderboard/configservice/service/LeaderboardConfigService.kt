@@ -5,12 +5,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.platforms.leaderboard.configservice.dto.LeaderboardConfigDto
+import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.util.FileCopyUtils
 import java.io.InputStreamReader
-import javax.annotation.PostConstruct
 
 @Service
 class LeaderboardConfigService(
@@ -45,6 +45,17 @@ class LeaderboardConfigService(
      */
     fun convertToJson(config: LeaderboardConfigDto): String {
         return objectMapper.writeValueAsString(config)
+    }
+    
+    /**
+     * Get leaderboard configuration by instance ID
+     * @param instanceId The leaderboard instance ID
+     * @return The leaderboard configuration DTO
+     */
+    fun getConfig(instanceId: String): LeaderboardConfigDto {
+        // TODO: Implement actual lookup by instanceId
+        // For now, return the sample config
+        return getSampleConfig()
     }
     
     private fun loadSampleConfig(): LeaderboardConfigDto {

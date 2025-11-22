@@ -5,30 +5,20 @@
   "name": "Top Gamers Leaderboard",
   "featureConfig": [
     {
-      "name": "playerName",
-      "dataType": "STRING",
-      "required": true
-    },
-    {
-      "name": "score",
+      "name": "numberOfPayments",
       "dataType": "INTEGER",
       "required": true
     },
     {
-      "name": "level",
+      "name": "totalAmount",
       "dataType": "INTEGER",
-      "required": false
-    },
-    {
-      "name": "lastPlayed",
-      "dataType": "STRING",
-      "required": false
+      "required": true
     }
   ],
   "rankingOrder": "HIGHEST_FIRST",
   "scoringStrategy": {
-    "spelExpression": "#score * (1 + #level * 0.1)",
-    "features": ["score", "level"]
+    "spelExpression": "10 * #numberOfPayments",
+    "features": ["numberOfPayments"]
   },
   "recurringConfig": {
     "cronExpression": "0 0 0 * * ?",

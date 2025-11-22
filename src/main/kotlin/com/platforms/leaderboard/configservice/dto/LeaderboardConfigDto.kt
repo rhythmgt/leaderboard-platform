@@ -18,4 +18,17 @@ data class LeaderboardConfigDto(
     val updatedAt: Instant = Instant.now(),
     val startTime: Instant,
     val endTime: Instant? = null
-)
+) {
+    /**
+     * Determines if a score should be considered higher than another score
+     * based on the configured ranking order.
+     * 
+     * @param score1 The first score to compare
+     * @param score2 The second score to compare
+     * @return true if score1 is considered higher than score2 based on the ranking order
+     */
+    fun highestFirst(): Boolean {
+        return rankingOrder == RankingOrder.HIGHEST_FIRST
+
+    }
+}
