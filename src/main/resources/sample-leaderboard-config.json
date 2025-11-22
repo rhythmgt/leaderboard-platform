@@ -1,0 +1,40 @@
+{
+  "id": "lb-config-123",
+  "tenantId": "tenant-001",
+  "version": 1,
+  "name": "Top Gamers Leaderboard",
+  "featureConfig": [
+    {
+      "name": "playerName",
+      "dataType": "STRING",
+      "required": true
+    },
+    {
+      "name": "score",
+      "dataType": "INTEGER",
+      "required": true
+    },
+    {
+      "name": "level",
+      "dataType": "INTEGER",
+      "required": false
+    },
+    {
+      "name": "lastPlayed",
+      "dataType": "STRING",
+      "required": false
+    }
+  ],
+  "rankingOrder": "HIGHEST_FIRST",
+  "scoringStrategy": {
+    "spelExpression": "#score * (1 + #level * 0.1)",
+    "features": ["score", "level"]
+  },
+  "recurringConfig": {
+    "cronExpression": "0 0 0 * * ?",
+    "recurringEndTime": "2024-12-31T23:59:59Z"
+  },
+  "status": "ACTIVE",
+  "startTime": "2023-01-01T00:00:00Z",
+  "endTime": "2023-12-31T23:59:59Z"
+}
