@@ -6,9 +6,9 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1/leaderboard")
+@RequestMapping("/api/v1")
 @Validated
-class LeaderboardController(
+class UserScoreReadController(
     private val leaderboardService: LeaderboardService
 ) {
     companion object {
@@ -23,25 +23,25 @@ class LeaderboardController(
      * @return List of leaderboard entries with 1-based ranks
      * @throws javax.validation.ConstraintViolationException if limit is out of range
      */
-    @GetMapping("/top")
+    @GetMapping("/user-score/top")
     suspend fun getTop(
-        @RequestParam instanceId: String,
+        @RequestParam leaderboardInstanceId: String,
         @RequestParam(defaultValue = "10") limit: Int
     ): List<LeaderboardEntry> {
-        return leaderboardService.getTop(instanceId, limit)
+        return leaderboardService.getTop(leaderboardInstanceId, limit)
     }
 
     /**
      * Get a user's rank and score from the leaderboard
      * @param userId The ID of the user
-     * @param instanceId The ID of the leaderboard instance
+     * @param leaderboardInstanceId The ID of the leaderboard instance
      * @return The leaderboard entry for the user with 1-based rank, or null if not found
      */
-    @GetMapping("/rank/{userId}")
+    @GetMapping("/user-score/{userId}")
     suspend fun getUserRank(
         @PathVariable userId: String,
-        @RequestParam instanceId: String
+        @RequestParam leaderboardInstanceId: String
     ): LeaderboardEntry? {
-        return leaderboardService.getUserRank(userId, instanceId)
+        return leaderboardService.getUserRank(userId, leaderboardInstanceId)
     }
 }

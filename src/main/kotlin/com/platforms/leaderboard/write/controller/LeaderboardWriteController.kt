@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController
 import org.slf4j.LoggerFactory
 
 @RestController
-@RequestMapping("/api/v1/leaderboard/write")
-class LeaderboardWriteController(
+@RequestMapping("/api/v1")
+class UserScoreWriteController(
     private val leaderboardWriteService: LeaderboardWriteService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -20,7 +20,7 @@ class LeaderboardWriteController(
     /**
      * Update score with features that will be used to calculate the score
      */
-    @PostMapping("/score/features")
+    @PostMapping("/user-score")
     suspend fun updateScoreWithFeatures(
         @RequestBody request: FeatureBasedScoreUpdateRequest
     ): ResponseEntity<ScoreUpdateResponse> {

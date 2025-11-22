@@ -11,7 +11,7 @@ from typing import Dict, Any, Optional, List, Tuple
 from urllib.parse import urljoin
 
 # Configuration
-BASE_URL = "http://localhost:8080/api/v1/leaderboard"
+BASE_URL = "http://localhost:8080/api/v1/"
 HEALTH_CHECK_URL = "http://localhost:8080/actuator/health"
 DB_CONFIG = {
     "host": "localhost",
@@ -51,6 +51,20 @@ def post_to_api(endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
     headers = {'Content-Type': 'application/json'}
     try:
         response = requests.post(url, json=data, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Error calling {endpoint}: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            print(f"Status code: {e.response.status_code}")
+            print(f"Response: {e.response.text}")
+        raise
+
+def get_from_api(endpoint: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Helper function to make GET requests to the API."""
+    url = urljoin(BASE_URL, endpoint)
+    try:
+        response = requests.get(url, params=params)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
@@ -102,7 +116,7 @@ def setup_test_data():
         # Using the formula: score = (number_of_payments * 100) + (total_amount * 0.1)
         # To get scores: 1000, 900, 800, ..., 100
         number_of_payments = i  # 1 to 10
-        total_amount = (1000 - ((i-1) * 100)) * 10 - (number_of_payments * 1000)
+        total_amount = (1000 * (i))
         
         request_data = {
             "leaderboardInstanceId": "leaderboard1",
@@ -113,11 +127,21 @@ def setup_test_data():
             }
         }
         
+        post_to_api('user-score', {
+            'leaderboardInstanceId': 'leaderboard1',
+            'userId': user_id,
+            'features': {
+                'numberOfPayments': number_of_payments,
+                'totalAmount': total_amount
+            }
+        })
+        
         print(f"  - Setting features for {user_id}: {request_data['features']}")
-        response = post_to_api("leaderboard/write/score/features", request_data)
+        response = post_to_api("user-score", request_data)
         
         if not response.get('success', False):
             print(f"❌ Failed to set features for {user_id}")
+            print(f"Response: {response}")
     
     print("\n✅ Test data inserted using feature-based scoring")
 
@@ -129,7 +153,14 @@ def test_endpoint(name: str, endpoint: str, params: Optional[Dict[str, Any]] = N
     print(f"Params: {params or 'None'}")
     
     try:
-        response = requests.get(url, params=params)
+        # Handle both GET and POST requests
+        if endpoint == "user-score" and params and 'features' in params:
+            # This is a write operation
+            response = requests.post(url, json=params)
+        else:
+            # This is a read operation
+            response = requests.get(url, params=params)
+            
         response.raise_for_status()
         print("✅ Success:")
         print(json.dumps(response.json(), indent=2))
@@ -150,53 +181,27 @@ def main():
             print("❌ Failed to start services")
             return 1
         
-#         # Wait for the application to start and be ready to accept requests
-#         print("\n⏳ Waiting for the application to start...")
-#         max_attempts = 10
-#         for attempt in range(1, max_attempts + 1):
-#             try:
-#                 health_url = HEALTH_CHECK_URL
-#                 response = requests.get(health_url)
-#                 if response.status_code == 200 and response.json().get('status') == 'UP':
-#                     print("✅ Application is up and running")
-#                     break
-#             except requests.exceptions.RequestException:
-#                 pass
-#
-#             if attempt < max_attempts:
-#                 print(f"  Attempt {attempt}/{max_attempts}: Application not ready, retrying in 3 seconds...")
-#                 time.sleep(3)
-#         else:
-#             print("❌ Application did not start in time")
-#             return 1
-#
-#         # Clear data stores and set up test data
         clear_data_stores()
         setup_test_data()
         
         # Test leaderboard endpoints
         print("\n🏆 Testing Leaderboard Endpoints")
         
-        # Test top scores endpoint
-        test_endpoint(
-            "Top Scores",
-            "leaderboard/top",
-            {"instanceId": "leaderboard1", "limit": 5}
-        )
+        instance_id = "leaderboard1"
+        limit = 5
+        test_user_id = "user5"
         
-        # Test user rank endpoint
-        test_endpoint(
-            "User Rank",
-            "leaderboard/rank/user5",
-            {"instanceId": "leaderboard1"}
-        )
+        # Test getting top scores
+        print("\n🔍 Testing Top Scores:")
+        test_endpoint("Top Scores", "user-score/top", {"leaderboardInstanceId": instance_id, "limit": limit})
         
-        # Test top scores with default limit (should be 10)
-        test_endpoint(
-            "Top Scores with Default Limit",
-            "leaderboard/top",
-            {"instanceId": "leaderboard1"}
-        )
+        # Test getting a specific user's rank
+        print("\n🔍 Testing User Rank:")
+        test_endpoint("User Rank", f"user-score/{test_user_id}", {"leaderboardInstanceId": instance_id})
+        
+        # Test getting top scores with default limit
+        print("\n🔍 Testing Top Scores with Default Limit:")
+        test_endpoint("Top Scores Default", "user-score/top", {"leaderboardInstanceId": instance_id})
         
         print("\n✅ All tests completed successfully!")
         

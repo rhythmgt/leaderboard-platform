@@ -47,22 +47,22 @@ A high-performance, multi-tenant leaderboard platform with real-time score updat
 
 ## API Endpoints
 
-### Write API
-- `POST /api/v1/leaderboard/write/score/features` - Update a user's score using feature-based calculation
+### User Score API
+- `POST /api/v1/user-score` - Update a user's score using feature-based calculation
   ```json
   {
     "leaderboardInstanceId": "leaderboard1",
     "userId": "user123",
     "features": {
       "numberOfPayments": 5,
-      "totalAmount": 1000.0
+      "totalAmount": 1000
     }
   }
   ```
 
-### Read API
-- `GET /api/v1/leaderboard/read/leaderboard1/top?limit=10` - Get top 10 users
-- `GET /api/v1/leaderboard/read/leaderboard1/rank/user123` - Get rank for a specific user
+### Leaderboard API
+- `GET /api/v1/leaderboard/user-score/top?leaderboardInstanceId=leaderboard1&limit=10` - Get top users
+- `GET /api/v1/leaderboard/user-score/{userId}?leaderboardInstanceId=leaderboard1` - Get rank for a specific user
 
 ## Testing with Test Script
 
